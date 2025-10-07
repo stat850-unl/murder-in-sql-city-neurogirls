@@ -2,7 +2,7 @@
 title: "Homework: Murder in SQL City"
 execute:
   error: true
-author: "Your Name"
+author: "Alisha Schaefer and Kaitlyn Steck"
 output: html_document
 ---
 
@@ -51,7 +51,7 @@ This database schema may help you figure out how to navigate the database:
 ```{r db-setup-r}
 library(RSQLite)
 library(DBI)
-
+library(dplyr)
 # Your database connection code goes here. Store the connection as con 
 con <- dbConnect(RSQLite::SQLite(), "sql-murder-mystery.db")
 
@@ -71,6 +71,50 @@ purrr::walk(table_names, function(x) {
 
 # close the connection when you're done
 dbDisconnect(con)
+
+
+##filtering day, type, and city
+day_of_crime <- crime_scene_report %>%
+  filter(date == "20180115",
+     type == "murder",
+     city == "SQL City")
+
+day_of_crime$description
+
+# [1] "Security footage shows that there were 2 witnesses. The first witness lives at the last house on \"Northwestern Dr\". The second witness, named Annabel, lives somewhere on \"Franklin Ave\"."
+
+interview<-interview%>%
+  mutate(id = person_id)
+
+interview_people<- left_join(interview, person)
+
+interview_street <- interview_people %>%
+  filter(
+    address_street_name == "Northwestern Dr",
+    id == "14887"
+  )
+
+interview_name <- separate(interview_people, "name", c("first_name", "last_name"), sep = " ")
+
+interview_name <- interview_name %>%
+  filter(
+    first_name == "Annabel" 
+  )
+interview_name$name <-
+  paste(interview_name$first_name, interview_name$last_name, sep = " ")
+
+witness_transcripts <- full_join(interview_street, interview_name)
+witness_transcripts$transcript
+
+# [1] "I heard a gunshot and then saw a man run out. He had a \"Get Fit Now Gym\" bag. The membership number on the bag started with \"48Z\". Only gold members have those bags. The man got into a car with a plate that included \"H42W\"."
+# [2] "I saw the murder happen, and I recognized the killer from my gym when I was working out last week on January the 9th."
+
+killer_membership <- filter(id == "48Z")
+
+## look at 20180115 in facebook events
+event_info <- left_join(day_of_crime, facebook_event_checkin)
+
+
 ```
 
 
