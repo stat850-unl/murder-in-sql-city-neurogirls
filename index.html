@@ -159,14 +159,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># close the connection when you're done</span></span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">dbDisconnect</span>(con)</span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="do">##filtering day, type, and city</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>day_of_crime <span class="ot">&lt;-</span> crime_scene_report <span class="sc">%&gt;%</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">==</span> <span class="st">"20180115"</span>,</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>     type <span class="sc">==</span> <span class="st">"murder"</span>,</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>     city <span class="sc">==</span> <span class="st">"SQL City"</span>)</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>day_of_crime<span class="sc">$</span>description</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="do">##filtering day, type, and city</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>day_of_crime <span class="ot">&lt;-</span> crime_scene_report <span class="sc">%&gt;%</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(date <span class="sc">==</span> <span class="st">"20180115"</span>,</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>     type <span class="sc">==</span> <span class="st">"murder"</span>,</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>     city <span class="sc">==</span> <span class="st">"SQL City"</span>)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>day_of_crime<span class="sc">$</span>description</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Security footage shows that there were 2 witnesses. The first witness lives at the last house on \"Northwestern Dr\". The second witness, named Annabel, lives somewhere on \"Franklin Ave\"."</code></pre>
 </div>
@@ -201,42 +200,68 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># [1] "I heard a gunshot and then saw a man run out. He had a \"Get Fit Now Gym\" bag. The membership number on the bag started with \"48Z\". Only gold members have those bags. The man got into a car with a plate that included \"H42W\"."</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># [2] "I saw the murder happen, and I recognized the killer from my gym when I was working out last week on January the 9th."</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>killer_membership <span class="ot">&lt;-</span> get_fit_now_member <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">str_starts</span>(id, <span class="st">"48Z"</span>))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>suspect_membership <span class="ot">&lt;-</span> get_fit_now_member <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">str_starts</span>(id, <span class="st">"48Z"</span>))</span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>potential_killers <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(person, suspect_membership, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'id'</span> <span class="ot">=</span> <span class="st">'person_id'</span>))</span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>potential_killers <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(person, killer_membership, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'id'</span> <span class="ot">=</span> <span class="st">'person_id'</span>))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>jan9_checkin <span class="ot">&lt;-</span> get_fit_now_check_in <span class="sc">%&gt;%</span> <span class="fu">filter</span>(check_in_date <span class="sc">==</span> <span class="st">'20180109'</span>)</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>jan9_checkin <span class="ot">&lt;-</span> get_fit_now_check_in <span class="sc">%&gt;%</span> <span class="fu">filter</span>(check_in_date <span class="sc">==</span> <span class="st">'20180109'</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>jan9_suspect_at_gym <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(potential_killers, jan9_checkin, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'id.y'</span> <span class="ot">=</span> <span class="st">'membership_id'</span>)) <span class="co">#there are duplicates we can probably do this better in class</span></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>jan9_killer_at_gym <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(potential_killers, jan9_checkin, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'id.y'</span> <span class="ot">=</span> <span class="st">'membership_id'</span>)) <span class="co">#there are duplicates we can probably do this better in class</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>suspect_drivers_license <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(jan9_suspect_at_gym, drivers_license, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'license_id'</span> <span class="ot">=</span> <span class="st">'id'</span>)) <span class="co">#we can also do this a lot better in class I was just nosey</span></span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>killer_drivers_license <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(jan9_killer_at_gym, drivers_license, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'license_id'</span> <span class="ot">=</span> <span class="st">'id'</span>)) <span class="co">#we can also do this a lot better in class I was just nosey</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="do">## look at 20180115 in facebook events</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>event_info <span class="ot">&lt;-</span> <span class="fu">left_join</span>(day_of_crime, facebook_event_checkin)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="do">## look at 20180115 in facebook events</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>event_info <span class="ot">&lt;-</span> <span class="fu">left_join</span>(day_of_crime, facebook_event_checkin, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'date'</span> <span class="ot">=</span> <span class="st">'date'</span>))</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>suspect_facebook_event <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(suspect_drivers_license, event_info, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'id'</span> <span class="ot">=</span> <span class="st">'person_id'</span>))</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>suspect_interview <span class="ot">&lt;-</span> interview <span class="sc">%&gt;%</span> <span class="fu">filter</span>(person_id <span class="sc">==</span> <span class="st">'67318'</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>suspect_interview<span class="sc">$</span>transcript</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "I was hired by a woman with a lot of money. I don't know her name but I know she's around 5'5\" (65\") or 5'7\" (67\"). She has red hair and she drives a Tesla Model S. I know that she attended the SQL Symphony Concert 3 times in December 2017.\n"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#"I was hired by a woman with a lot of money. I don't know her name but I know she's around 5'5\" (65\") or 5'7\" (67\"). She has red hair and she drives a Tesla Model S. I know that she attended the SQL Symphony Concert 3 times in December 2017.\n"</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>killer_description <span class="ot">&lt;-</span> drivers_license <span class="sc">%&gt;%</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(height <span class="sc">&gt;=</span> <span class="dv">65</span>, height <span class="sc">&lt;=</span> <span class="dv">67</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>         hair_color <span class="sc">==</span> <span class="st">'red'</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>         car_make <span class="sc">==</span> <span class="st">"Tesla"</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>         car_model <span class="sc">==</span> <span class="st">"Model S"</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>killer_person <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(killer_description, person, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'id'</span> <span class="ot">=</span> <span class="st">'license_id'</span>))</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>SQL_Symphony <span class="ot">&lt;-</span> facebook_event_checkin <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">str_starts</span>(event_name, <span class="st">'SQL Symphony'</span>), <span class="fu">str_starts</span>(date, <span class="st">"201712"</span>)) <span class="sc">%&gt;%</span> <span class="fu">count</span>(person_id) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(n <span class="sc">==</span> <span class="st">'3'</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>killer_SQL_Event <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(killer_person, SQL_Symphony, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'id.y'</span> <span class="ot">=</span> <span class="st">'person_id'</span>))</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>income_killer <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(killer_SQL_Event, income) <span class="co">#310,000 annually!!!!!!</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>miranda_interview <span class="ot">&lt;-</span> interview <span class="sc">%&gt;%</span> <span class="fu">filter</span>(person_id <span class="sc">==</span> <span class="st">'99716'</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>miranda_interview<span class="sc">$</span>transcript <span class="co">#no transcript! </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>character(0)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Miranda Priestly#</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="python" class="level2">
 <h2 class="anchored" data-anchor-id="python">Python</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Read sqlite query results into a pandas DataFrame</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>con <span class="op">=</span> sqlite3.<span class="ex">connect</span>(<span class="st">"sql-murder-mystery.db"</span>)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>crime_scene_report <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from crime_scene_report"</span>, con)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>drivers_license <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from drivers_license"</span>, con)</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>facebook_event_checkin <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from facebook_event_checkin"</span>, con)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>get_fit_now_check_in <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from get_fit_now_check_in"</span>, con)</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>get_fit_now_member <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from get_fit_now_member"</span>, con)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>income <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from income"</span>, con)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>interview <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from interview"</span>, con)</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>person <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from person"</span>, con)</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify that result of SQL query is stored in the dataframe</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(crime_scene_report.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Read sqlite query results into a pandas DataFrame</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>con <span class="op">=</span> sqlite3.<span class="ex">connect</span>(<span class="st">"sql-murder-mystery.db"</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>crime_scene_report <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from crime_scene_report"</span>, con)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>drivers_license <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from drivers_license"</span>, con)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>facebook_event_checkin <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from facebook_event_checkin"</span>, con)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>get_fit_now_check_in <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from get_fit_now_check_in"</span>, con)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>get_fit_now_member <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from get_fit_now_member"</span>, con)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>income <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from income"</span>, con)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>interview <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from interview"</span>, con)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>person <span class="op">=</span> pd.read_sql_query(<span class="st">"SELECT * from person"</span>, con)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify that result of SQL query is stored in the dataframe</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(crime_scene_report.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       date  ...      city
 0  20180115  ...       NYC
@@ -247,8 +272,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 [5 rows x 4 columns]</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>con.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>con.close()</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">#looking into the day, type of murder and the city </span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>day_of_crime <span class="op">=</span> crime_scene_report[</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  (crime_scene_report[<span class="st">'date'</span>] <span class="op">==</span> <span class="dv">20180115</span>) <span class="op">&amp;</span> </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  (crime_scene_report[<span class="st">'type'</span>] <span class="op">==</span> <span class="st">'murder'</span>) <span class="op">&amp;</span> </span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  (crime_scene_report[<span class="st">'city'</span>] <span class="op">==</span> <span class="st">'SQL City'</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 

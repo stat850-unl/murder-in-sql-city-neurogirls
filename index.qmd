@@ -110,18 +110,18 @@ witness_transcripts$transcript
 
 suspect_membership <- get_fit_now_member %>% filter(str_starts(id, "48Z"))
 
-potential_killers <- inner_join(person, killer_membership, by = c('id' = 'person_id'))
+potential_killers <- inner_join(person, suspect_membership, by = c('id' = 'person_id'))
 
 jan9_checkin <- get_fit_now_check_in %>% filter(check_in_date == '20180109')
 
 jan9_suspect_at_gym <- inner_join(potential_killers, jan9_checkin, by = c('id.y' = 'membership_id')) #there are duplicates we can probably do this better in class
 
-suspect_drivers_license <- inner_join(jan9_killer_at_gym, drivers_license, by = c('license_id' = 'id')) #we can also do this a lot better in class I was just nosey
+suspect_drivers_license <- inner_join(jan9_suspect_at_gym, drivers_license, by = c('license_id' = 'id')) #we can also do this a lot better in class I was just nosey
 
 ## look at 20180115 in facebook events
 event_info <- left_join(day_of_crime, facebook_event_checkin, by = c('date' = 'date'))
 
-suspect_facebook_event <- inner_join(killer_drivers_license, event_info, by = c('id' = 'person_id'))
+suspect_facebook_event <- inner_join(suspect_drivers_license, event_info, by = c('id' = 'person_id'))
 
 suspect_interview <- interview %>% filter(person_id == '67318')
 suspect_interview$transcript
@@ -138,6 +138,9 @@ SQL_Symphony <- facebook_event_checkin %>% filter(str_starts(event_name, 'SQL Sy
 
 killer_SQL_Event <- inner_join(killer_person, SQL_Symphony, by = c('id.y' = 'person_id'))
 income_killer <- inner_join(killer_SQL_Event, income) #310,000 annually!!!!!!
+
+miranda_interview <- interview %>% filter(person_id == '99716')
+miranda_interview$transcript #no transcript! 
 #Miranda Priestly#
 
 ```
@@ -168,13 +171,10 @@ print(crime_scene_report.head())
 con.close()
 
 #looking into the day, type of murder and the city 
-day = crime_scene_report[
-  (crime_scene_report['date'] == '20180115')
-]
 
 
 day_of_crime = crime_scene_report[
-  (crime_scene_report['date'] == '20180115') & 
+  (crime_scene_report['date'] == 20180115) & 
   (crime_scene_report['type'] == 'murder') & 
   (crime_scene_report['city'] == 'SQL City')
 ]
