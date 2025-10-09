@@ -72,7 +72,6 @@ purrr::walk(table_names, function(x) {
 # close the connection when you're done
 dbDisconnect(con)
 
-
 ##filtering day, type, and city
 day_of_crime <- crime_scene_report %>%
   filter(date == "20180115",
@@ -109,21 +108,27 @@ witness_transcripts$transcript
 # [1] "I heard a gunshot and then saw a man run out. He had a \"Get Fit Now Gym\" bag. The membership number on the bag started with \"48Z\". Only gold members have those bags. The man got into a car with a plate that included \"H42W\"."
 # [2] "I saw the murder happen, and I recognized the killer from my gym when I was working out last week on January the 9th."
 
-killer_membership <- get_fit_now_member %>% filter(str_starts(id, "48Z"))
-
-
+suspect_membership <- get_fit_now_member %>% filter(str_starts(id, "48Z"))
 
 potential_killers <- inner_join(person, killer_membership, by = c('id' = 'person_id'))
 
 jan9_checkin <- get_fit_now_check_in %>% filter(check_in_date == '20180109')
 
-jan9_killer_at_gym <- inner_join(potential_killers, jan9_checkin, by = c('id.y' = 'membership_id')) #there are duplicates we can probably do this better in class
+jan9_suspect_at_gym <- inner_join(potential_killers, jan9_checkin, by = c('id.y' = 'membership_id')) #there are duplicates we can probably do this better in class
 
-killer_drivers_license <- inner_join(jan9_killer_at_gym, drivers_license, by = c('license_id' = 'id')) #we can also do this a lot better in class I was just nosey
+suspect_drivers_license <- inner_join(jan9_killer_at_gym, drivers_license, by = c('license_id' = 'id')) #we can also do this a lot better in class I was just nosey
 
 ## look at 20180115 in facebook events
-event_info <- left_join(day_of_crime, facebook_event_checkin)
+event_info <- left_join(day_of_crime, facebook_event_checkin, by = c('date' = 'date'))
 
+suspect_facebook_event <- inner_join(killer_drivers_license, event_info, by = c('id' = 'person_id'))
+
+suspect_interview <- interview %>% filter(person_id == '67318')
+suspect_interview$transcript
+#"I was hired by a woman with a lot of money. I don't know her name but I know she's around 5'5\" (65\") or 5'7\" (67\"). She has red hair and she drives a Tesla Model S. I know that she attended the SQL Symphony Concert 3 times in December 2017.\n"
+
+
+#either went to the facebook event before or after the murder to create an alibi
 
 ```
 
@@ -151,4 +156,9 @@ person = pd.read_sql_query("SELECT * from person", con)
 print(crime_scene_report.head())
 
 con.close()
+
+#looking into the day, type of murder and the city 
+
+day_of_crime = crime_scene_report.filter[(crime_scene_report['date']=='20180115'), ]
+
 ```
