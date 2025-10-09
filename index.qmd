@@ -127,8 +127,18 @@ suspect_interview <- interview %>% filter(person_id == '67318')
 suspect_interview$transcript
 #"I was hired by a woman with a lot of money. I don't know her name but I know she's around 5'5\" (65\") or 5'7\" (67\"). She has red hair and she drives a Tesla Model S. I know that she attended the SQL Symphony Concert 3 times in December 2017.\n"
 
+killer_description <- drivers_license %>% 
+  filter(height >= 65, height <= 67,
+         hair_color == 'red',
+         car_make == "Tesla",
+         car_model == "Model S")
+killer_person <- inner_join(killer_description, person, by = c('id' = 'license_id'))
 
-#either went to the facebook event before or after the murder to create an alibi
+SQL_Symphony <- facebook_event_checkin %>% filter(str_starts(event_name, 'SQL Symphony'), str_starts(date, "201712")) %>% count(person_id) %>% filter(n == '3')
+
+killer_SQL_Event <- inner_join(killer_person, SQL_Symphony, by = c('id.y' = 'person_id'))
+income_killer <- inner_join(killer_SQL_Event, income) #310,000 annually!!!!!!
+#Miranda Priestly#
 
 ```
 
@@ -158,7 +168,15 @@ print(crime_scene_report.head())
 con.close()
 
 #looking into the day, type of murder and the city 
+day = crime_scene_report[
+  (crime_scene_report['date'] == '20180115')
+]
 
-day_of_crime = crime_scene_report.filter[(crime_scene_report['date']=='20180115'), ]
+
+day_of_crime = crime_scene_report[
+  (crime_scene_report['date'] == '20180115') & 
+  (crime_scene_report['type'] == 'murder') & 
+  (crime_scene_report['city'] == 'SQL City')
+]
 
 ```
